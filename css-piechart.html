@@ -1,0 +1,157 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+The `css-piechart` element draws a piechart using DOM and CSS3
+
+##### Example
+
+    <css-piechart size="50" data="[10,20,40,50]"></css-piechart>
+
+@element css-piechart
+@blurb Draws a piechart using DOM and CSS3
+@status alpha
+@homepage http://timeu.github.io/css-piechart
+-->
+<polymer-element name="css-piechart" attributes="size data">
+ <template>
+   <style>
+     :host {
+       display:inline-block;
+     }
+     #background  {
+       width:{{size}}px;
+       height:{{size}}px;
+       position:relative;
+       border-radius:{{size}}px;
+       background-color:{{baseColor}};
+     }
+     .slice {
+       position:absolute;
+       top:0px;
+       left:0px;
+       width:{{size}}px;
+       height:{{size}}px;
+       border-radius :{{size}}px;
+     }
+     .pie  {
+       position:absolute;
+       top:0px;
+       left:0px;
+       width:{{size}}px;
+       height:{{size}}px;
+       border-radius :{{size}}px;
+     }
+   </style>
+   <div id="container">
+       <div id="background" style="width:{{size}}px;height:{{size}}px;border-radius:{{size}}px;background-color:{{baseColor}};">
+         <template repeat="{{slice,sliceIndex in slices}}">
+           <template if="{{slice.percentage <= 50}}">
+             <div class="slice" style="-webkit-transform:rotate({{slice.beforeDegree}}deg);transform:rotate({{slice.beforeDegree}}deg);clip:rect(0px,{{size}}px,{{size}}px,{{size/2}}px);width:{{size}}px;height:{{size}}px;border-radius :{{size}}px;">
+                <div class="pie" style="-webkit-transform:rotate({{slice.degree}}deg);transform:rotate({{slice.degree}}deg);clip:rect(0px,{{size/2}}px,{{size}}px,0px);background-color:{{slice.backgroundColor}};width:{{size}}px;height:{{size}}px;border-radius :{{size}}px;">
+                </div>
+             </div>
+           </template>
+            <template if="{{slice.percentage > 50}}">
+              <div class="slice" style="-webkit-transform:rotate({{slice.beforeDegree}}deg);transform:rotate({{slice.beforeDegree}}deg);clip:rect(0px,{{size}}px,{{size}}px,{{(size-100)/2}}px);width:{{size}}px;height:{{size}}px;border-radius :{{size}}px;">
+                <div class="pie" style="-webkit-transform:rotate(180deg);transform:rotate(180deg);background-color:{{slice.backgroundColor}};width:{{size}}px;height:{{size}}px;border-radius :{{size}}px;clip:rect(0px,{{size/2}}px,{{size}}px,0px)">
+                </div>
+              </div>
+              <div class="slice" style="-webkit-transform:rotate({{180+ (sliceIndex == 0 ? slice.beforeDegree : (slice.beforeDegree -1))}}deg);transform:rotate({{180+(sliceIndex == 0 ? slice.beforeDegree : (slice.beforeDegree -1))}}deg);clip:rect(0px,{{size}}px,{{size}}px,{{size/2}}px);width:{{size}}px;height:{{size}}px;border-radius:{{size}}px;">
+                <div class="pie" style="-webkit-transform:rotate({{(sliceIndex == 0 ? slice.degree : (slice.degree +1))}}deg);transform:rotate({{(sliceIndex == 0 ? slice.degree : (slice.degree +1))}}deg);clip:rect(0px,{{size/2}}px,{{size}}px,0px);background-color:{{slice.backgroundColor}};width:{{size}}px;height:{{size}}px;border-radius :{{size}}px;">
+                </div>
+              </div>
+            </template>
+         </template>
+       </div>
+   </div>
+  </template>
+  <script>
+     (function() {
+
+       var DEFAULT_COLORS20  =  ["#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5"];
+       var DEFAULT_COLORS10  =  ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"];
+
+
+       Polymer('css-piechart',{
+         /**
+         * The `colors` attribute specifies the colors to be used for each slice.
+         * If no colors are specified then the default-colors are used.
+         * 
+         * @attribute colors
+         * @type array[string]
+         */
+        colors: null,
+
+        /**
+         * The `size` property specifies the size of the piechart (Default: 50).
+         * 
+         * @attribute size
+         * @type number
+         */
+        size: 50,
+        /**
+         * The `data` property specifies the values for each slice .
+         * 
+         * @attribute data
+         * @type array[number]
+        */
+         slices : null,
+         baseColor_ : "transparent",
+         observe : {
+           data : 'render_',
+           size : 'render_'
+         },
+         created : function() {
+           this.data = this.data || [];
+         },
+         getColors_ : function() {
+          var colors = this.colors;
+          if (!colors) {
+            colors = this.data.length > 10  ? DEFAULT_COLORS20 : DEFAULT_COLORS10;
+          }
+          return colors;
+         },
+         getTotal_: function() {
+          var total = 0;
+          for (var i =0;i<this.data.length;i++) {
+            total += this.data[i];
+          }
+          return total;
+
+         },
+         getPercentages_ : function() {
+           var total = this.getTotal_();
+           var percentages = [];
+           for (var i=0;i<this.data.length;i++) {
+             percentages.push(100*this.data[i]/total);
+           }
+           return percentages;
+         },
+         render_ : function() {
+          var percentages = this.getPercentages_();
+          var colors = this.getColors_();
+          slices = [];
+          var beforeDegree = 0;
+          var degree = 0;
+          for (var i =0;i<percentages.length;i++) {
+            var piePercentage = percentages[i];
+            var slice = {percentage:piePercentage,size:this.size,backgroundColor:colors[i]};
+            if(piePercentage<=50) {
+              degree = parseFloat((180*piePercentage)/50);
+              slice.beforeDegree = beforeDegree;
+              slice.degree = degree;
+              beforeDegree +=degree;
+            }
+            else {
+              degree = parseFloat(((piePercentage-50)*180)/50);
+              slice.beforeDegree =  beforeDegree;
+              slice.degree = degree;
+              beforeDegree += (180+degree);
+            }
+            slices.push(slice);
+          }
+          this.slices = slices;
+       }
+     })
+   })();
+  </script>

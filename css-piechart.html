@@ -12,7 +12,7 @@ The `css-piechart` element draws a piechart using DOM and CSS3
 @status alpha
 @homepage http://timeu.github.io/css-piechart
 -->
-<polymer-element name="css-piechart" attributes="size data">
+<polymer-element name="css-piechart" attributes="size data colors">
  <template>
    <style>
      :host {
@@ -108,6 +108,8 @@ The `css-piechart` element draws a piechart using DOM and CSS3
           var colors = this.colors;
           if (!colors) {
             colors = this.data.length > 10  ? DEFAULT_COLORS20 : DEFAULT_COLORS10;
+          } else {
+            colors = JSON.parse(this.colors);
           }
           return colors;
          },

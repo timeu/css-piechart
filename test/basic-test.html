@@ -1,0 +1,103 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <!-- Step 1: import the element to test -->
+    <link rel="import" href="../css-piechart.html">
+  </head>
+  <body>
+
+    <!-- You can use the document as a place to set up your fixtures. -->
+    <css-piechart></css-piechart>
+
+    <script>
+      var myEl = document.querySelector('css-piechart');
+
+      suite('<css-piechart>', function() {
+        // Clean up after ourselves.
+        teardown(function(done) {
+          myEl.colors = [];
+          myEl.data = []
+          myEl.size = 50;
+          flush(done);
+        });
+        
+        test('defaults', function() {
+          assert.equal(myEl.colors.length,0);
+          assert.equal(myEl.size,50);
+          assert.equal(myEl.data.length,0);
+        });
+        
+        test('get custom colors when defined',function() {
+          var customColors = ['red','green','blue']; 
+          myEl.colors = customColors;
+          assert.equal(myEl.colors,customColors); 
+          assert.equal(myEl._getColors(customColors),customColors);
+        });
+        
+        test('get 10 colors when slices <=10',function() {
+          assert.equal(myEl.colors.length,0); 
+          assert.equal(myEl._getColors([]).length,10);
+        });
+        test('get 20 colors when slices > 10',function() {
+          assert.equal(myEl.colors.length,0);
+          myEl.data = [1,2,3,4,5,6,7,8,9,10,11]; 
+          assert.equal(myEl._getColors().length,20);
+        });
+        test('calculate total',function() {
+          var data = [1,2,4,5,6,7,8,9,10];
+          assert.equal(myEl._calculateTotal(data),52);
+        });
+        test('calcualte percentages', function() {
+          var percentages =  [20,40,40];
+          var data = [20,40,40]
+          assert.deepEqual(myEl._calculatePercentages(data),percentages);
+        });
+        test('compute slices', function() {
+          var slicesToCheck = [{backgroundColor:'red',beforeDegree:0,degree:72,isRight:false,percentage:20,size:50},
+                               {backgroundColor:'green',beforeDegree:72,degree:144,isRight:false,percentage:40,size:50},
+                               {backgroundColor:'blue',beforeDegree:216,degree:144,isRight:false,percentage:40,size:50}]
+          var data = [20,40,40];
+          var colors = ['red','green','blue'];
+          var slices = myEl._computeSlices(colors,data,50);
+          assert.equal(slices.length,3);
+          assert.deepEqual(slices,slicesToCheck);
+        });
+        test('test DOM', function(done) {
+          myEl.data = [20,40,40];
+          myEl.colors = ['red','green','blue'];
+          var background = Polymer.dom(myEl.root).querySelector("#background");
+          assert.equal(background.style.width,"50px");
+          assert.equal(background.style.height,"50px");
+          assert.equal(background.style.borderTopLeftRadius,"50px");
+          assert.equal(background.style.borderTopRightRadius,"50px");
+          assert.equal(background.style.borderBottomRightRadius,"50px");
+          assert.equal(background.style.borderBottomLeftRadius,"50px");
+          assert.equal(background.style.backgroundColor,'transparent');
+          async.nextTick(function() {
+            var slicesEl = Polymer.dom(myEl.root).querySelectorAll('.slice');
+            var piesEl = Polymer.dom(myEl.root).querySelectorAll('.pie');
+            assert.equal(slicesEl.length,3);
+            assert.equal(piesEl.length,3);
+            done();
+          });
+        });
+      });
+    </script>
+
+  </body>
+</html>

@@ -31,9 +31,20 @@ Or [download as ZIP](https://github.com/timeu/css-piechart/archive/master.zip).
 
 3. Start using it!
 
-  ```html
+<!---
+```
+<custom-element-demo>
+  <template>
+    <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="css-piechart.html">
+    <next-code-block></next-code-block>
+  </template>
+</custom-element-demo>
+```
+-->
+```html
   <css-piechart size="250" data="[10,20,50,20]"></css-piechart>
-  ```
+```
 
 ## Options
 

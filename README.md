@@ -7,7 +7,7 @@
 **This branch (1.x) works only with Polymer 1.x. For a Polymer 2.x version check out the [master branch](https://github.com/timeu/css-piechart/tree/master)**
 
 ## Demo
-> [Check it live](http://timeu.github.io/css-piechart/components/css-piechart/demo/index.html).
+> [Check it live](https://www.webcomponents.org/element/timeu/css-piechart).
 
 ## Install
 

@@ -14,25 +14,25 @@ The `css-piechart` element draws a piechart using DOM and CSS3
 @homepage http://timeu.github.io/pie-charts
 -->
 <dom-module id="css-piechart">
-  <style>
-    :host {
-       display:inline-block;
-     }
-     #background  {
-       position:relative;
-     }
-     .slice {
-       position:absolute;
-       top:0px;
-       left:0px;
-     }
-     .pie  {
-       position:absolute;
-       top:0px;
-       left:0px;
-     }
-  </style>
   <template>
+    <style>
+    :host {
+        display:inline-block;
+      }
+      #background  {
+        position:relative;
+      }
+      .slice {
+        position:absolute;
+        top:0px;
+        left:0px;
+      }
+      .pie  {
+        position:absolute;
+        top:0px;
+        left:0px;
+      }
+    </style>
     <div id="container">
        <div id="background" style$="{{_computeContainerStyle(size,baseColor)}}">
          <template is="dom-repeat" items={{_computeSlices(colors,data,size)}}>
@@ -52,45 +52,77 @@ The `css-piechart` element draws a piechart using DOM and CSS3
 
 <script>
   (function() {
-    var DEFAULT_COLORS20  =  ["#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5"];
-    var DEFAULT_COLORS10  =  ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"];
+    var DEFAULT_COLORS16 = [
+      '#f44336',
+      '#e91e63',
+      '#9c27b0',
+      '#673ab7',
+      '#3f51b5',
+      '#1e88e5',
+      '#03a9f4',
+      '#00bcd4',
+      '#009688',
+      '#4caf50',
+      '#8bc34a',
+      '#cddc39',
+      '#ffeb3b',
+      '#ffc107',
+      '#ff9800',
+      '#ff5722'
+    ];
+    var DEFAULT_COLORS8 = [
+      '#f44336',
+      '#9c27b0',
+      '#3f51b5',
+      '#03a9f4',
+      '#009688',
+      '#8bc34a',
+      '#ffeb3b',
+      '#ff9800'
+    ];
+    var DEFAULT_COLORS4 = [
+      '#f44336',
+      '#3f51b5',
+      '#8bc34a',
+      '#ffeb3b',
+    ];
 
 
     Polymer({
-       
+
       is: 'css-piechart',
-       
+
       properties: {
         /**
         * The `colors` attribute specifies the colors to be used for each slice.
         * If no colors are specified then the default-colors are used.
-        * 
+        *
         * @attribute colors
         */
         colors: {
-          type:Array, 
+          type:Array,
           value: function() { return []; }
         },
-        
+
         /**
         * The `size` property specifies the size of the piechart (Default: 50).
-        * 
+        *
         * @attribute size
         */
         size: {
           type:Number,
           value:50
         },
-        
+
         /**
          * The `data` property specifies the values for each slice.
-         * 
+         *
          * @attribute data
         */
         data : {
           type:Array,
           value: function() { return []; }
-        }, 
+        },
         /**
          * The `baseColor` property specifies the base-color of the contaner.
         */
@@ -107,7 +139,7 @@ The `css-piechart` element draws a piechart using DOM and CSS3
            return "-webkit-transform:rotate("+slice.beforeDegree+"deg);transform:rotate("+slice.beforeDegree+"deg);clip:rect(0px,"+size+"px,"+size+"px,"+(size-100)/2+"px);width:"+size+"px;height:"+size+"px;border-radius :"+size+"px";
          }
          return "-webkit-transform:rotate("+slice.beforeDegree+"deg);transform:rotate("+slice.beforeDegree+"deg);clip:rect(0px,"+size+"px,"+size+"px,"+size/2+"px);width:"+size+"px;height:"+size+"px;border-radius :"+size+"px;";
-         
+
       },
       _computeSecondOuterStyle : function(slice,size,index)  {
         var beforeDegree = 180+ (index == 0 ? slice.beforeDegree : (slice.beforeDegree -1));
@@ -123,9 +155,17 @@ The `css-piechart` element draws a piechart using DOM and CSS3
         }
         return "-webkit-transform:rotate("+slice.degree+"deg);transform:rotate("+slice.degree+"deg);clip:rect(0px,"+size/2+"px,"+size+"px,0px);background-color:"+slice.backgroundColor+";width:"+size+"px;height:"+size+"px;border-radius :"+size+"px;";
       },
-      _getColors : function(colors) {
+      _getColors: function(colors) {
         if (!colors || colors.length == 0) {
-          colors = this.data.length > 10  ? DEFAULT_COLORS20 : DEFAULT_COLORS10;
+          if (this.data.length > 8) {
+            colors = DEFAULT_COLORS16;
+          }
+          else if (this.data.length > 4) {
+            colors = DEFAULT_COLORS8;
+          }
+          else {
+            colors = DEFAULT_COLORS4;
+          }
         }
         return colors;
       },

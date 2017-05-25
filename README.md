@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/timeu/css-piechart.svg?branch=master)](https://travis-ci.org/timeu/css-piechart) [![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/timeu/css-piechart)
+[![Build Status](https://travis-ci.org/timeu/css-piechart.svg?branch=1.x)](https://travis-ci.org/timeu/css-piechart) [![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/timeu/css-piechart)
 
 # &lt;css-piechart&gt;
 

@@ -11,7 +11,7 @@ The *master* branch and all *2.x.x* releases require `Polymer 2.x`.
 For `Polymer 1.x` support use *1.x.x* releases and the [1.x branch](https://github.com/timeu/css-piechart/tree/1.x).
 
 ## Demo
-> [Check it live](http://timeu.github.io/css-piechart/components/css-piechart/demo/index.html).
+> [Check it live](https://www.webcomponents.org/element/timeu/css-piechart).
 
 ## Install
 

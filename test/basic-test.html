@@ -79,7 +79,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         test('test DOM', function(done) {
           myEl.data = [20,40,40];
           myEl.colors = ['red','green','blue'];
-          var background = Polymer.dom(myEl.root).querySelector("#background");
+          var shRoot = myEl.shadowRoot;
+          var background = shRoot.querySelector("#background");
           assert.equal(background.style.width,"50px");
           assert.equal(background.style.height,"50px");
           assert.equal(background.style.borderTopLeftRadius,"50px");
@@ -88,8 +89,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           assert.equal(background.style.borderBottomLeftRadius,"50px");
           assert.equal(background.style.backgroundColor,'transparent');
           async.nextTick(function() {
-            var slicesEl = Polymer.dom(myEl.root).querySelectorAll('.slice');
-            var piesEl = Polymer.dom(myEl.root).querySelectorAll('.pie');
+            var slicesEl = shRoot.querySelectorAll('.slice');
+            var piesEl =shRoot.querySelectorAll('.pie');
             assert.equal(slicesEl.length,3);
             assert.equal(piesEl.length,3);
             done();

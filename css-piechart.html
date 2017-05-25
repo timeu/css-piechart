@@ -1,4 +1,6 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../polymer/lib/elements/dom-if.html">
 
 <!--
 The `css-piechart` element draws a piechart using DOM and CSS3
@@ -7,7 +9,7 @@ The `css-piechart` element draws a piechart using DOM and CSS3
 
     <css-piechart size="50" data="[10,20,40,50]"></css-piechart>
 
-@demo
+@demo demo/index.html
 @element css-piechart
 @blurb Draws a piechart using DOM and CSS3
 @status alpha
@@ -17,21 +19,21 @@ The `css-piechart` element draws a piechart using DOM and CSS3
   <template>
     <style>
     :host {
-        display:inline-block;
-      }
-      #background  {
-        position:relative;
-      }
-      .slice {
-        position:absolute;
-        top:0px;
-        left:0px;
-      }
-      .pie  {
-        position:absolute;
-        top:0px;
-        left:0px;
-      }
+      display:inline-block;
+    }
+    #background  {
+      position:relative;
+    }
+    .slice {
+      position:absolute;
+      top:0px;
+      left:0px;
+    }
+    .pie  {
+      position:absolute;
+      top:0px;
+      left:0px;
+    }
     </style>
     <div id="container">
        <div id="background" style$="{{_computeContainerStyle(size,baseColor)}}">
@@ -51,48 +53,19 @@ The `css-piechart` element draws a piechart using DOM and CSS3
 </dom-module>
 
 <script>
-  (function() {
-    var DEFAULT_COLORS16 = [
-      '#f44336',
-      '#e91e63',
-      '#9c27b0',
-      '#673ab7',
-      '#3f51b5',
-      '#1e88e5',
-      '#03a9f4',
-      '#00bcd4',
-      '#009688',
-      '#4caf50',
-      '#8bc34a',
-      '#cddc39',
-      '#ffeb3b',
-      '#ffc107',
-      '#ff9800',
-      '#ff5722'
-    ];
-    var DEFAULT_COLORS8 = [
-      '#f44336',
-      '#9c27b0',
-      '#3f51b5',
-      '#03a9f4',
-      '#009688',
-      '#8bc34a',
-      '#ffeb3b',
-      '#ff9800'
-    ];
-    var DEFAULT_COLORS4 = [
-      '#f44336',
-      '#3f51b5',
-      '#8bc34a',
-      '#ffeb3b',
-    ];
+  class CssPiechart extends Polymer.Element {
 
+    static get DEFAULT_COLORS16() {return [ '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5','#1e88e5','#03a9f4','#00bcd4','#009688','#4caf50','#8bc34a',
+    '#cddc39','#ffeb3b','#ffc107','#ff9800','#ff5722'];}
 
-    Polymer({
+    static get DEFAULT_COLORS8() {return ['#f44336','#9c27b0','#3f51b5',
+    '#03a9f4','#009688','#8bc34a','#ffeb3b','#ff9800'];}
 
-      is: 'css-piechart',
+    static get DEFAULT_COLORS4() {return ['#f44336','#3f51b5','#8bc34a','#ffeb3b',]}
 
-      properties: {
+    static get is() { return 'css-piechart'; }
+    static get properties() {
+      return {
         /**
         * The `colors` attribute specifies the colors to be used for each slice.
         * If no colors are specified then the default-colors are used.
@@ -115,101 +88,104 @@ The `css-piechart` element draws a piechart using DOM and CSS3
         },
 
         /**
-         * The `data` property specifies the values for each slice.
-         *
-         * @attribute data
+          * The `data` property specifies the values for each slice.
+          *
+          * @attribute data
         */
         data : {
           type:Array,
           value: function() { return []; }
         },
         /**
-         * The `baseColor` property specifies the base-color of the contaner.
+          * The `baseColor` property specifies the base-color of the contaner.
         */
         baseColor : {
           type:String,
           value:'transparent'
         }
-      },
-      _computeContainerStyle: function(size,baseColor) {
-         return "width:"+size+"px;height:"+size+"px;border-radius:"+size+"px;background-color:"+baseColor+";";
-      },
-      _computeOuterStyle : function(slice,size) {
-         if (slice.isRight) {
-           return "-webkit-transform:rotate("+slice.beforeDegree+"deg);transform:rotate("+slice.beforeDegree+"deg);clip:rect(0px,"+size+"px,"+size+"px,"+(size-100)/2+"px);width:"+size+"px;height:"+size+"px;border-radius :"+size+"px";
-         }
-         return "-webkit-transform:rotate("+slice.beforeDegree+"deg);transform:rotate("+slice.beforeDegree+"deg);clip:rect(0px,"+size+"px,"+size+"px,"+size/2+"px);width:"+size+"px;height:"+size+"px;border-radius :"+size+"px;";
-
-      },
-      _computeSecondOuterStyle : function(slice,size,index)  {
-        var beforeDegree = 180+ (index == 0 ? slice.beforeDegree : (slice.beforeDegree -1));
-        return "-webkit-transform:rotate("+beforeDegree+"deg);transform:rotate("+beforeDegree+"deg);clip:rect(0px,"+size+"px,"+size+"px,"+size/2+"px);width:"+size+"px;height:"+size+"px;border-radius:"+size+"px;";
-      },
-      _computeSecondInnerStyle : function(slice,size,index) {
-        var degree = (index == 0 ? slice.degree : (slice.degree +1));
-        return "-webkit-transform:rotate("+degree+"deg);transform:rotate("+degree+"deg);clip:rect(0px,"+size/2+"px,"+size+"px,0px);background-color:"+slice.backgroundColor+";width:"+size+"px;height:"+size+"px;border-radius:"+size+"px;";
-      },
-      _computeInnerStyle : function(slice,size) {
-        if (slice.isRight) {
-          return "-webkit-transform:rotate(180deg);transform:rotate(180deg);background-color:"+slice.backgroundColor+";width:"+size+"px;height:"+size+"px;border-radius :"+size+"px;clip:rect(0px,"+size/2+"px,"+size+"px,0px)";
-        }
-        return "-webkit-transform:rotate("+slice.degree+"deg);transform:rotate("+slice.degree+"deg);clip:rect(0px,"+size/2+"px,"+size+"px,0px);background-color:"+slice.backgroundColor+";width:"+size+"px;height:"+size+"px;border-radius :"+size+"px;";
-      },
-      _getColors: function(colors) {
-        if (!colors || colors.length == 0) {
-          if (this.data.length > 8) {
-            colors = DEFAULT_COLORS16;
-          }
-          else if (this.data.length > 4) {
-            colors = DEFAULT_COLORS8;
-          }
-          else {
-            colors = DEFAULT_COLORS4;
-          }
-        }
-        return colors;
-      },
-      _calculateTotal: function(data) {
-        var total = 0;
-        for (var i =0;i<data.length;i++) {
-          total += data[i];
-        }
-        return total;
-      },
-      _calculatePercentages : function(data) {
-       var percentages = [];
-       var total = this._calculateTotal(data);
-       for (var i=0;i<data.length;i++) {
-         percentages.push(100*data[i]/total);
-       }
-       return percentages;
-      },
-      _computeSlices : function(colors,data,size) {
-        var backGroundColors = this._getColors(colors);
-        var percentages = this._calculatePercentages(data);
-        var slices = [];
-        var beforeDegree = 0;
-        var degree = 0;
-        for (var i =0;i<percentages.length;i++) {
-          var piePercentage = percentages[i];
-          var slice = {percentage:piePercentage,size:size,backgroundColor:backGroundColors[i],isRight:false};
-          if(piePercentage<=50) {
-            degree = parseFloat((180*piePercentage)/50);
-            slice.beforeDegree = beforeDegree;
-            slice.degree = degree;
-            beforeDegree +=degree;
-          }
-          else {
-            degree = parseFloat(((piePercentage-50)*180)/50);
-            slice.beforeDegree =  beforeDegree;
-            slice.degree = degree;
-            beforeDegree += (180+degree);
-            slice.isRight = true;
-          }
-          slices.push(slice);
-        }
-        return slices;
       }
-    })
-  })();
+    }
+
+    _computeContainerStyle(size,baseColor) {
+        return "width:"+size+"px;height:"+size+"px;border-radius:"+size+"px;background-color:"+baseColor+";";
+    }
+    _computeOuterStyle(slice,size) {
+        if (slice.isRight) {
+          return "-webkit-transform:rotate("+slice.beforeDegree+"deg);transform:rotate("+slice.beforeDegree+"deg);clip:rect(0px,"+size+"px,"+size+"px,"+(size-100)/2+"px);width:"+size+"px;height:"+size+"px;border-radius :"+size+"px";
+        }
+        return "-webkit-transform:rotate("+slice.beforeDegree+"deg);transform:rotate("+slice.beforeDegree+"deg);clip:rect(0px,"+size+"px,"+size+"px,"+size/2+"px);width:"+size+"px;height:"+size+"px;border-radius :"+size+"px;";
+
+    }
+    _computeSecondOuterStyle(slice,size,index)  {
+      let beforeDegree = 180+ (index == 0 ? slice.beforeDegree : (slice.beforeDegree -1));
+      return "-webkit-transform:rotate("+beforeDegree+"deg);transform:rotate("+beforeDegree+"deg);clip:rect(0px,"+size+"px,"+size+"px,"+size/2+"px);width:"+size+"px;height:"+size+"px;border-radius:"+size+"px;";
+    }
+    _computeSecondInnerStyle(slice,size,index) {
+      let degree = (index == 0 ? slice.degree : (slice.degree +1));
+      return "-webkit-transform:rotate("+degree+"deg);transform:rotate("+degree+"deg);clip:rect(0px,"+size/2+"px,"+size+"px,0px);background-color:"+slice.backgroundColor+";width:"+size+"px;height:"+size+"px;border-radius:"+size+"px;";
+    }
+    _computeInnerStyle(slice,size) {
+      if (slice.isRight) {
+        return "-webkit-transform:rotate(180deg);transform:rotate(180deg);background-color:"+slice.backgroundColor+";width:"+size+"px;height:"+size+"px;border-radius :"+size+"px;clip:rect(0px,"+size/2+"px,"+size+"px,0px)";
+      }
+      return "-webkit-transform:rotate("+slice.degree+"deg);transform:rotate("+slice.degree+"deg);clip:rect(0px,"+size/2+"px,"+size+"px,0px);background-color:"+slice.backgroundColor+";width:"+size+"px;height:"+size+"px;border-radius :"+size+"px;";
+    }
+    _getColors(colors) {
+      if (!colors || colors.length == 0) {
+        if (this.data.length > 8) {
+          colors = this.constructor.DEFAULT_COLORS16;
+        }
+        else if (this.data.length > 4) {
+          colors = this.constructor.DEFAULT_COLORS8;
+        }
+        else {
+          colors = this.constructor.DEFAULT_COLORS4;
+        }
+      }
+      return colors;
+    }
+    _calculateTotal(data) {
+      let total = 0;
+      for (let i =0;i<data.length;i++) {
+        total += data[i];
+      }
+      return total;
+    }
+    _calculatePercentages(data) {
+      let percentages = [];
+      let total = this._calculateTotal(data);
+      for (let i=0;i<data.length;i++) {
+        percentages.push(100*data[i]/total);
+      }
+      return percentages;
+    }
+    _computeSlices(colors,data,size) {
+      let backGroundColors = this._getColors(colors);
+      let percentages = this._calculatePercentages(data);
+      let slices = [];
+      let beforeDegree = 0;
+      let degree = 0;
+      for (let i =0;i<percentages.length;i++) {
+        let piePercentage = percentages[i];
+        let slice = {percentage:piePercentage,size:size,backgroundColor:backGroundColors[i],isRight:false};
+        if(piePercentage<=50) {
+          degree = parseFloat((180*piePercentage)/50);
+          slice.beforeDegree = beforeDegree;
+          slice.degree = degree;
+          beforeDegree +=degree;
+        }
+        else {
+          degree = parseFloat(((piePercentage-50)*180)/50);
+          slice.beforeDegree =  beforeDegree;
+          slice.degree = degree;
+          beforeDegree += (180+degree);
+          slice.isRight = true;
+        }
+        slices.push(slice);
+      }
+      return slices;
+    }
+  }
+  window.customElements.define(CssPiechart.is, CssPiechart);
+
 </script>
